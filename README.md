@@ -1,8 +1,4 @@
-# HW6b Academic Journal Impact Factor Analysis and Visualization Framework
-
-**Team name: SevenJobs**
-
-_Team member: Jiahui Zhu_, _Jie Sun_, _Sitong Shang_
+# Academic Journal Impact Factor Analysis and Visualization Framework
 
 This file describes the idea of the framework and how to start and extend it.
 
