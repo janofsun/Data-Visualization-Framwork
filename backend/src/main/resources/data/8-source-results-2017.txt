@@ -1,0 +1,9 @@
+Source title,CiteScore,Highest percentile,2014-17 Citations,2014-17 Documents,% Cited,SNIP,SJR,Publisher
+Nature,53.7,99.0% 1/88,243783.0,4539.0,87.0,8.7,17.875,Springer Nature
+Applied Physics Reviews,22.1,96.0% 8/207 General Physics and Astronomy,3176.0,144.0,86.0,6.343,4.156,American Institute of Physics
+Physical Review Letters,15.7,95.0% 10/207 General Physics and Astronomy,159524.0,10172.0,89.0,2.7,3.622,American Physical Society
+Applied Physics Letters,6.9,91.0% 4/43 Physics and Astronomy (miscellaneous),98151.0,14211.0,82.0,1.25,1.382,American Institute of Physics
+Physical Review A,5.1,80.0% 34/170 Atomic and Molecular Physics, and Optics,54802.0,10666.0,78.0,1.02,N/A,American Physical Society
+Applied Physics Express,4.9,92.0% 21/276 General Engineering,7591.0,1550.0,74.0,1.113,0.931,Japan Society of Applied Physics
+Journal of Applied Physics,4.4,84.0% 33/207 General Physics and Astronomy,52824.0,11879.0,78.0,1.017,0.739,American Institute of Physics
+Physics of Plasmas,3.6,69.0% 121/395 Condensed Matter Physics,18920.0,5308.0,71.0,1.066,0.576,American Institute of Physics

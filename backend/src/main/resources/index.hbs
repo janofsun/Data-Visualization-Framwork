@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Journal Impact Factor Data Visualization Framework</title>
+
+  <style>
+    body {
+        margin: 0;
+    }
+    a {
+        background: skyblue;
+        text-align: center;
+        color: white;
+        padding: 18px;
+        text-decoration: none;
+        font-size: 32px;
+        border: 6px solid;
+        border-radius: 32px;
+    }
+
+    h2 {
+        font-size: 20px;
+        color: pink;
+    }
+
+    h3 {
+        font-size: 16px;
+        color: black;
+    }
+
+    input,
+    select {
+        font-size: 1.3rem;
+        border: none;
+        padding: 5px;
+        border-radius: 3px;
+        color: gray;
+        margin-bottom: 10px;
+    }
+
+    #instruction {
+        margin: 0;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        margin-bottom: 40px;
+    }
+
+    #currentplugin {
+        margin: 0;
+        margin-bottom: 50px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    #data_list {
+        gap: 15px;
+        width: fit-content;
+        margin: auto;
+    }
+
+    #res_area {
+        width: fit-content;
+        margin: auto;
+        background-color: pink;
+        width: 80%;
+        font-size: 32px;
+        border-radius: 10px;
+    }
+
+    #key_input {
+        flex-direction: column;
+        width: 18rem;
+        color: white;
+        margin: auto;
+        display: flex;
+    }
+
+    #display_res {
+        background-color: pink;
+        color: white;
+        font-size: 32px;
+        font-weight: 500;
+        width: 80%;
+        text-align: center;
+        margin: auto;
+        border: none;
+        border-radius: 10px;
+    }
+
+    #submit_button {
+        font-size: 40px;
+        width: 25%;
+        padding: 5px;
+        border: none;
+        background: grey;
+        border-radius: 5px;
+    }
+
+    #home_page {
+        padding: 5px;
+        background-color: pink;
+        color: white;
+        border-radius: 4px;
+        top: 18px;
+        left: 18px;
+        font-size: 20px;
+        width: fit-content;
+        position: absolute;
+    }
+
+  </style>
+  <script src='https://cdn.plot.ly/plotly-2.6.3.min.js'></script>
+</head>
+<body>
+    <div><h1>Journal Impact Factor Data Visualization Framework</h1></div>
+    <div id="instruction">
+        <h3>Instruction: Choose your wanted data plugin firstly, then select the wanted display plugin. 
+            Enter the year or the year range you want to check. For the csv and txt data plugin, the available year range is from 2017-2021, 
+            and you must enter both start year and end year to display the result. 
+            We also provide calculations for the average and standard deviation, but you can only select one of the data to view. 
+            You can continue change the year range if you want to use same plugin after one displaying process. 
+            However, if you want to change the display plugin or the data plugin, please use the home page button to restart the process. 
+            After getting the display plot, you can point your mouse over any chart on the page to see the detailed information. 
+            You can also select the data you want to see by choosing the legend on the right side.
+        </h3>
+    </div>
+    <div id="currentplugin">
+        <h2>{{currentDisplayPlugin}}</h2>
+        <button id="home_page" onclick="location.href='/'">Back to Home</button>
+    </div>
+    {{#eq stage 0 }}
+    <div id="data_list">
+        <a href="/dataplugin?i=0">CSV</a>
+        <a href="/dataplugin?i=1">TXT</a>
+        <a href="/dataplugin?i=2">Web Source</a>
+    </div>
+    {{/eq}}
+    {{#eq stage 1 }}
+    <form id="display_res" onsubmit="selectDisplay()">
+        <label for="display_type">Choose display plugin:</label>
+        <select id="display_type" name="display_type">
+            <option value="0">Show Bar Chart</option>
+            <option value="1">Show Histogram</option>
+            <option value="2">Show Time-Series</option>
+        </select>
+        <button type="submit" id="submit" >Apply</button>
+    </form>
+    {{/eq}}
+    {{#eq stage 2 }}
+    <div id="res_area">
+         <form id="key_input" onsubmit="getYearKey()">
+            <!-- News Plugin Rendering Page -->
+            <label for="time_from">From:</label>
+                <input id="time_from" type="number" name="from", min="2017", max="2021"/>
+                <label for="time_to">To:</label>
+                <input id="time_to" type="number" name="to", min="2017", max="2021"/>
+            <label for="summary">Summary:</label>
+            <!-- Average or Standard Deviation -->
+            <input type="checkbox" id="Average" name="summary0" value="0">
+            <label for="Average">Average</label>
+            <input type="checkbox" id="Standard Deviation" name="summary1" value="1">
+            <label for="Standard Deviation">Standard Deviation</label>
+            <button id="submit_button" type="submit">OK</button>
+         </form>
+         <div id="chart_wrapper" style="margin-top: 10px">
+                <div id="barchart"></div>
+                <div id="histogram"></div>
+                <div id="timeseries"></div>
+         </div>
+    </div>
+    {{/eq}}
+</body>
+<script type="text/javascript">
+    function selectDisplay() {
+        const form = document.getElementById("display_res");
+        const displayType = document.getElementById("display_type").value;
+
+        // Choose the action URL based on the display plugin
+        let actionUrl = "/visualplugin?display_type=" + displayType;
+        form.action = actionUrl;
+        form.submit(); 
+    }
+
+    function getYearKey() {
+        const form = document.getElementById("key_input");
+        const timeFrom = document.getElementById("time_from").value;
+        const timeTo = document.getElementById("time_to").value;
+
+        const averageCheckbox = document.getElementById("Average");
+        const standardDeviationCheckbox = document.getElementById("Standard Deviation");
+
+        let summary = "";
+        if (averageCheckbox.checked) {
+            summary += "0";
+        }
+        if (standardDeviationCheckbox.checked) {
+            summary += "1";
+        }
+
+        let actionUrl = `/getparams?from=${timeFrom}&to=${timeTo}&summary=${summary}`;
+        form.action = actionUrl;
+        form.submit();
+    }
+</script>
+<script>
+    function renderLinePlot() {
+        const visualizedData = {{{visualizedData}}};
+        const xData = visualizedData.x;
+        const yData = visualizedData.y;
+        const titles = visualizedData.title;
+
+        if (titles !== undefined) {
+            const newXData = visualizedData.x.map((year, index) => `${titles[index]} (${year})`);
+            const groupSize = [];
+
+            for (let i = 0; i < titles.length; i++) {
+                if (i === 0) {
+                    groupSize.push(1);
+                } else if (titles[i] === titles[i - 1]) {
+                    groupSize[groupSize.length - 1] += 1;
+                } else {
+                    groupSize.push(1);
+                }
+            }
+
+            var data = [];
+            let dataIndex = 0;
+            for (let i = 0; i < 8; i++) {
+                const size = groupSize[i];
+                var trace = {
+                    x: newXData.slice(dataIndex, dataIndex + size),
+                    y: yData.slice(dataIndex, dataIndex + size),
+                    type: 'scatter'
+                };
+                data.push(trace);
+                dataIndex += size;
+            }
+        } else {
+            var trace = {
+                x: xData,
+                y: yData,
+                type: 'scatter'
+            };
+            var data = [trace];
+        }
+
+        const layout = {
+            title: 'Journal Impact Factor Analytics Line Chart',
+            xaxis: {
+                title: 'Year',
+                type: 'category',
+            },
+            yaxis: {
+                title: 'Impact Factor',
+            }
+        };
+
+        Plotly.newPlot('timeseries', data, layout);
+    }
+
+    function renderBarPlot() {
+        const visualizedData = {{{visualizedData}}};
+        const xData = visualizedData.x;
+        const yData = visualizedData.y;
+        const titles = visualizedData.title;
+
+        const newXData = visualizedData.x.map((year, index) => `${titles[index]} (${year})`);
+
+        const trace = {
+            x: yData,
+            y: newXData,
+            type: 'bar',
+            orientation: 'h'
+        };
+        const data = [trace];
+
+        const layout = {
+            title: 'Journal Impact Factor Analytics Bar Chart',
+            xaxis: {
+                title: 'Impact Factor'
+                //type: 'category',
+            },
+            barmode: 'group',
+        };
+
+        Plotly.newPlot('barchart', data, layout);
+}
+    function renderHistogram() {
+        const visualizedData = {{{visualizedData}}};
+        const yData = visualizedData.x;
+        const titles = visualizedData.title;
+        const years = visualizedData.y;
+
+        var xData = Array.from(new Set(titles));
+        var uniqueYears = Array.from(new Set(years));
+
+        var data = [];
+
+        uniqueYears.forEach(year => {
+            var trace = {
+                x: xData,
+                y: [],
+                name: year,
+                type: 'bar'
+            };
+            
+            xData.forEach(journal => {
+                var index = titles.findIndex((title, i) => title === journal && years[i] === year);
+                trace.y.push(index !== -1 ? yData[index] : 0);
+            });
+            console.log(trace);
+
+            data.push(trace);
+        });
+
+        const layout = {
+            barmode: 'stack',
+            title: 'Journal Impact Factor Analytics Histogram',
+            xaxis: {
+                title: 'Journal'
+            },
+            yaxis: {
+                title: 'Impact Factor'
+            }
+        };
+        Plotly.newPlot('histogram', data, layout);
+    }
+
+    const visualizedData = {{{visualizedData}}};
+    if (visualizedData.type === "bar") {
+        renderBarPlot();
+    } else if (visualizedData.type === "HistogramChart") {
+        renderHistogram();
+    } else if (visualizedData.type === "line") {
+        renderLinePlot();
+    }
+</script>
+</html>

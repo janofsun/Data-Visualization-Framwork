@@ -1,0 +1,6 @@
+# List of data plugins to be registered by framework.
+# Provide fully qualified class names here ( edu.cmu.cs214.hw6.dataPlugin.XXX ),
+# with one plugin per line.
+edu.cmu.cs214.hw6.dataPlugin.CSVPlugin
+edu.cmu.cs214.hw6.dataPlugin.TXTPlugin
+edu.cmu.cs214.hw6.dataPlugin.WebAPIPlugin
